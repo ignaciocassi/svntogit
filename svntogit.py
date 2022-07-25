@@ -1,3 +1,4 @@
+import os
 import urllib
 from urllib import request
 from urllib.error import HTTPError
@@ -11,6 +12,16 @@ def prompt_subversion_server_credentials():
     return subversion_url, subversion_username, subversion_password
 
 
+def get_url_opener_and_request(subversion_url, subversion_username, subversion_password):
+    password_manager = urllib.request.HTTPPasswordMgrWithDefaultRealm()
+    password_manager.add_password(None, subversion_url, subversion_username, subversion_password)
+    auth_handler = urllib.request.HTTPBasicAuthHandler(password_manager)
+    url_opener = urllib.request.build_opener(auth_handler)
+    urllib.request.install_opener(url_opener)
+    svn_request = urllib.request.Request(subversion_url)
+    return url_opener, svn_request
+
+
 def get_subversion_server_response(subversion_url, subversion_username, subversion_password):
     url_opener, svn_request = get_url_opener_and_request(subversion_url, subversion_username, subversion_password)
     try:
@@ -22,28 +33,55 @@ def get_subversion_server_response(subversion_url, subversion_username, subversi
         prompt_subversion_server_credentials()
 
 
-def get_url_opener_and_request(subversion_url, subversion_username, subversion_password):
-    password_manager = urllib.request.HTTPPasswordMgrWithDefaultRealm()
-    password_manager.add_password(None, subversion_url, subversion_username, subversion_password)
-    auth_handler = urllib.request.HTTPBasicAuthHandler(password_manager)
-    url_opener = urllib.request.build_opener(auth_handler)
-    urllib.request.install_opener(url_opener)
-    svn_request = urllib.request.Request(subversion_url)
-    return url_opener, svn_request
-
-
 def parse_response_to_repo_list(response):
     soup = BeautifulSoup(response, features="html.parser")
-    return soup.find('ul')
+    repo_list = [a.text for a in soup.findAll('a')]
+    return repo_list
+
+
+def migrate_repositories(subversion_url, subversion_username, repo_list):
+    print("\n[*] Attempting to migrate a total of " + str(len(repo_list)) + " repositories from SVN to GIT.\n")
+    correct_repo_list = []
+    incorrect_repo_list = []
+    for i in range(1, len(repo_list)):
+        counter = "[" + str(i) + "/" + str(len(repo_list)) + "] -> "
+        command = "git svn clone --username=" + subversion_username \
+                  + " " + subversion_url + repo_list[i] + \
+                  " -T trunk -b branches -t tags"
+        print(counter + command)
+        # TODO: Handle perl.exe.stackdump child process exception.
+
+        if os.system(command) == 0:
+            print("[✓] " + subversion_url + repo_list[i] + " completed the migration process successfully.\n")
+            correct_repo_list.append(subversion_url + repo_list[i])
+        else:
+            print("\n[x] " + subversion_url + repo_list[i] + " completed the migration process with error status.\n")
+            incorrect_repo_list.append(subversion_url + repo_list[i])
+    return correct_repo_list, incorrect_repo_list
+
+
+def show_repo_migration_results(subversion_url, total_repos, correct_repo_list, incorrect_repo_list):
+    print("[*] The migration process ended. "
+          + str(total_repos) + " Were processed, "
+          + str(len(correct_repo_list)) + " were correct, and "
+          + str(len(incorrect_repo_list)) + " had errors.\n")
+
+    print("[✓] Correct repositories: ")
+    for correct_repo in correct_repo_list:
+        print("[✓] " + subversion_url, correct_repo)
+
+    print("\n[x] Incorrect repositories: ")
+    for correct_repo in correct_repo_list:
+        print("[x] " + subversion_url, correct_repo)
+    # TODO: Save results to files.
 
 
 def __main__():
-    # TODO: Read and validate Subversion URL from user input.
-    # TODO: Handle wrong credentials exception.
-    # TODO: Implement html response processing to obtain the list of repository names.
     subversion_url, subversion_username, subversion_password = prompt_subversion_server_credentials()
     response = get_subversion_server_response(subversion_url, subversion_username, subversion_password)
     repo_list = parse_response_to_repo_list(response)
+    correct_repo_list, incorrect_repo_list = migrate_repositories(subversion_url, subversion_username, repo_list)
+    show_repo_migration_results(subversion_url, len(repo_list), correct_repo_list, incorrect_repo_list)
 
 
 if __name__ == "__main__":

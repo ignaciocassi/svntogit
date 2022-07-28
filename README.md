@@ -16,7 +16,7 @@ Once this first stage is done, next is the migration itself of every repository.
  * [Git](https://git-scm.com/downloads) to manage the cloned repositories.
 
 
-**Now you can use the script directly from the terminal, to do so:**
+### Now you can use the script directly from the terminal, to do so:**
  * Copy the svntogit-subgit.py file into the folder you want all the new Git repositories to be stored.
  * Use `python3 svntogit-subgit.py` enter your credentials and wait all the repositories to be processed.
  

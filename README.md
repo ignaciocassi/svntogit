@@ -4,7 +4,7 @@ Svntogit is a script that allows for cloning of Subversion repositories and conv
 It consults the index of repositories, lists them and then uses either `Subgit` or `git svn clone`  to convert them.
 
 ##  How it works
-This script will download and convert all repositories from Subversion server from SVN to Git, using either `git svn clone` or `subgit clone`. In order to do that prompts for the needed credentials to access the server's repository list and catches it in HTML format. Using BeautifulSoup it filters the links for the repositories into a list.
+This script will download and convert all repositories from Subversion server from SVN to Git. In order to do that prompts for the needed credentials to access the server's repository list and catches it in HTML format. Using BeautifulSoup it filters the links for the repositories into a list.
 Once this first stage is done, next is the migration itself.  
 
 ## Using Svntogit as a Python script

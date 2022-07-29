@@ -21,5 +21,12 @@ Once this first stage is done, next is the migration itself of every repository.
  * Use `python3 svntogit-subgit.py` enter your credentials and wait all the repositories to be processed.
  
  ## Using Svntogit as an executable
-> Comming soon
+ 
+ ### Use the latest build:
+ * Download the compiled executable from the Releases section
+ 
+ ### Compile it with PyInstaller:
+ * Alternatively, you can compile it yourself using PyInstaller.
+ If you don't have it installed, you can do it with `pip install -U pyinstaller` and then use it to compile the script with `pyinstaller svntogit-subgit.py`
+ 
 

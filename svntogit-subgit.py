@@ -161,7 +161,7 @@ def show_repo_migration_results(total_repos, correct_repos, incorrect_repos):
     Shows the results of the repository migration, and saves the list of correct and incorrect repos to a file.
     :param total_repos: int The total of repositories processed.
     :param correct_repos: List of correctly processed repositories.
-    :param incorrect_repos: List of inccorrectly processed repositories.
+    :param incorrect_repos: List of incorrectly processed repositories.
     """
     print("\n[*] The migration process ended. "
           + str(total_repos) + " Were processed, "
